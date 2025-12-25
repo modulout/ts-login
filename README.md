@@ -1,5 +1,5 @@
 # Ts login popup - WordPress plugin
-[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](http://www.gnu.org/licenses/gpl-2.0.html) [![version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/modulout/ts_login)
+[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](http://www.gnu.org/licenses/gpl-2.0.html) [![version](https://img.shields.io/badge/version-1.0.5-blue.svg)](https://github.com/modulout/ts_login)
 
 With the TS login plugin, your users can log in or/and register from the front page (not needed to go to wp-admin anymore). A simple widget is added, but you can add a class for login and a class for registration on any website element. The plugin is working with the latest WordPress version and is fully customizable. You can change colors in wp-admin to have your website look-alike feel.
 
