@@ -4,7 +4,7 @@ Plugin Name: TS login
 Plugin URI: https://github.com/modulout/ts_login
 Description: With the TS login plugin, your users can log in or/and register from the front page (not needed to go to wp-admin anymore).
 Author: Modulout
-Version: 1.0.4
+Version: 1.0.5
 Author URI: https://www.modulout.com
 */
 if(!defined('WPINC')) {
