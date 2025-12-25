@@ -24,17 +24,19 @@ class Tsl_login_register extends WP_Widget {
             ?>
             <span class="tsl_login_form_header__logged js--tsl-logged-show">
                 <?php if($logout_value == 1) : ?>
-                    <a href="<?php echo wp_logout_url(home_url()); ?>" class="tsl_login_form_header__logged-btn btn btn-secondary">
+                    <a href="<?php echo wp_logout_url(home_url()); ?>" class="tsl_login_form_header__logged-btn">
                         <?php echo (get_option("tsl_logout_icon", "") != "") ? get_option("tsl_logout_icon", "")."&nbsp;" : ""; ?>
                         <?php esc_html_e("Log out", "tipster_script_login"); ?>
                     </a>
                 <?php else : ?>
-                    <i class="fa fa-user"></i>&nbsp;<?php echo $current_user->display_name; ?>
+                    <svg class="tsl-icon-user" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>&nbsp;<?php echo esc_html($current_user->display_name); ?>
+                    <svg class="tsl-icon-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     <ul class="tsl_login_form_header__logged-dd">
-                        <i class="fa fa-sort-up tsl_login_form_header__logged-dd-icon"></i>         
                         <li class="tsl_login_form_header__logged-dd-item">
-                            <i class="fa fa-sign-out tsl_logout_icon"></i>&nbsp;
-                            <a href="<?php echo wp_logout_url(home_url()); ?>"> <?php esc_html_e("Log out", "tipster_script_login"); ?></a>
+                            <a href="<?php echo wp_logout_url(home_url()); ?>">
+                                <svg class="tsl_logout_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                <?php esc_html_e("Log out", "tipster_script_login"); ?>
+                            </a>
                         </li>
                     </ul>
                 <?php endif; ?>

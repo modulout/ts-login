@@ -1,86 +1,592 @@
-.tsl_login_css .input {
-    border-radius: 2px;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: none;
+/* =====================================================
+   TS Login - Modern Popup Styles
+   ===================================================== */
+
+/* CSS Custom Properties (defaults - can be overridden by admin) */
+:root {
+    --tsl-header-bg: #1a1a2e;
+    --tsl-header-text: #ffffff;
+    --tsl-body-bg: #f8f9fa;
+    --tsl-body-text: #374151;
+    --tsl-input-bg: #ffffff;
+    --tsl-input-text: #1f2937;
+    --tsl-input-border: #e5e7eb;
+    --tsl-popup-border: #374151;
+    --tsl-btn-bg: #6366f1;
+    --tsl-btn-text: #ffffff;
+    --tsl-btn-border: #6366f1;
+    --tsl-btn-hover-bg: #4f46e5;
+    --tsl-btn-hover-text: #ffffff;
+    --tsl-btn-hover-border: #4f46e5;
+    --tsl-dropdown-bg: #ffffff;
+    --tsl-dropdown-text: #1f2937;
+    --tsl-dropdown-hover-text: #111827;
+    --tsl-logout-btn-bg: #6b7280;
+    --tsl-logout-btn-text: #ffffff;
+    --tsl-logout-btn-border: #6b7280;
+    --tsl-logout-btn-hover-bg: #4b5563;
+    --tsl-logout-btn-hover-text: #ffffff;
+    --tsl-logout-btn-hover-border: #4b5563;
+    --tsl-border-radius: 8px;
+    --tsl-transition: 0.2s ease;
+}
+
+/* =====================================================
+   Popup Overlay & Container
+   ===================================================== */
+.tsl-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    padding: 20px;
     box-sizing: border-box;
-    display: table;
-    height: auto;
-    padding: .75em;
-    transition: all .2s linear;
+}
+
+.tsl-popup-overlay.tsl-popup-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Forms container wrapper */
+.tsl-forms-container {
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Large forms container for template 3 */
+.tsl-forms-container:has(.tsl-popup-lg) {
+    max-width: 750px;
+}
+
+/* Form wrapper - handles show/hide */
+.tsl-form-wrapper {
     width: 100%;
 }
 
-.tsl_login_css #tsl_login_submit, .tsl_login_css #tsl_register_submit {
+.tsl-popup-container {
+    background: var(--tsl-body-bg);
+    border-radius: var(--tsl-border-radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--tsl-popup-border);
     width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transform: translateY(-20px);
+    transition: transform 0.25s ease;
 }
 
-.tsl_login_css .modal-header .modal-title {
-    margin-bottom: 0;
+/* Hide scrollbar but keep functionality */
+.tsl-popup-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tsl-popup-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tsl-popup-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.tsl-popup-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Firefox scrollbar */
+.tsl-popup-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.tsl-popup-overlay.tsl-popup-open .tsl-popup-container {
+    transform: translateY(0);
+}
+
+/* Large popup for template 3 (with image) */
+.tsl-popup-container.tsl-popup-lg {
+    max-width: 750px;
+    overflow: hidden;
+}
+
+/* =====================================================
+   Popup Header
+   ===================================================== */
+.tsl_login_css .tsl-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--tsl-header-bg);
+    border-bottom: 1px solid var(--tsl-popup-border);
+    border-radius: var(--tsl-border-radius) var(--tsl-border-radius) 0 0;
+}
+
+.tsl_login_css .tsl-popup-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tsl-header-text);
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Close Button */
+.tsl-popup-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background var(--tsl-transition);
+    color: #6b7280;
+}
+
+.tsl-popup-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.tsl-popup-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* =====================================================
+   Popup Body
+   ===================================================== */
+.tsl_login_css .tsl-popup-body {
+    padding: 20px;
+    background: var(--tsl-body-bg);
+    color: var(--tsl-body-text);
+}
+
+.tsl_login_css .tsl-popup-body p {
+    margin: 0 0 16px 0;
     line-height: 1.5;
 }
 
-.tsl_login_form_header__login, .tsl_login_form_header__register, .tsl_login_form_header__logged {
-    cursor: pointer;
+.tsl_login_css .tsl-popup-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tsl-body-text);
 }
 
-.tsl_login_css .tsl_form_error, .tsl_login_css .tsl_register_success, .tsl_lost_pass_success, .tsl_reset_pass_success {
-    display: none;
-}
-.tsl_login_form_header__logged-dd {
-    display: none;
-    list-style: none;
-    margin: 0;
-    min-width: 150px;   
-    padding: 0 0 5px 0;
-    position: relative;
-    text-align: center;
-    /*visibility: hidden;*/
-    white-space: nowrap;
-}
-.tsl_login_form_header__logged-dd-icon {
-    font-size: 20px;
-    margin-right: 0.65em;
-    position: absolute;
-    right: 2.7em;
-    top: -.4em;
-}
-.tsl_login_form_header__logged-dd-item {
-    box-shadow: 1px 1px 15px #79797924;
-    display: block;
+/* =====================================================
+   Form Inputs
+   ===================================================== */
+.tsl_login_css .input,
+.tsl_login_css input[type="text"],
+.tsl_login_css input[type="password"],
+.tsl_login_css input[type="email"],
+.tsl_login_css #lost-password-email,
+.tsl_login_css #new-password {
+    width: 100%;
+    padding: 10px 12px;
     font-size: 14px;
+    line-height: 1.5;
+    color: var(--tsl-input-text);
+    background-color: var(--tsl-input-bg);
+    border: 1px solid var(--tsl-input-border);
+    border-radius: var(--tsl-border-radius);
+    box-sizing: border-box;
+    transition: border-color var(--tsl-transition), box-shadow var(--tsl-transition);
+    outline: none;
+}
+
+.tsl_login_css .input:focus,
+.tsl_login_css input[type="text"]:focus,
+.tsl_login_css input[type="password"]:focus,
+.tsl_login_css input[type="email"]:focus,
+.tsl_login_css #lost-password-email:focus,
+.tsl_login_css #new-password:focus {
+    border-color: var(--tsl-btn-bg);
+    box-shadow: 0 0 0 3px rgba(1, 112, 185, 0.1);
+}
+
+.tsl_login_css .input.tsl-input-error,
+.tsl_login_css input.tsl-input-error {
+    border-color: #ef4444 !important;
+}
+
+/* Form paragraphs/groups */
+.tsl_login_css .login-username,
+.tsl_login_css .login-password,
+.tsl_login_css .tsl_register,
+.tsl_login_css .tsl-register-submit,
+.tsl_login_css .login-submit,
+.tsl_login_css #custom-lost-password,
+.tsl_login_css #custom-reset-password {
+    margin-bottom: 16px;
+}
+
+.tsl_login_css #custom-lost-password label,
+.tsl_login_css #custom-reset-password label {
+    margin-bottom: 6px;
+}
+
+.tsl_login_css #custom-lost-password br,
+.tsl_login_css #custom-reset-password br {
+    display: none;
+}
+
+/* =====================================================
+   Buttons
+   ===================================================== */
+.tsl_login_css #tsl_login_submit,
+.tsl_login_css #tsl_register_submit,
+.tsl_login_css #lost-password-submit,
+.tsl_login_css #save-password-submit,
+.tsl_login_css .button-primary {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--tsl-btn-text);
+    background-color: var(--tsl-btn-bg);
+    border: 1px solid var(--tsl-btn-border);
+    border-radius: var(--tsl-border-radius);
+    cursor: pointer;
+    transition: background-color var(--tsl-transition), border-color var(--tsl-transition);
+    margin-top: 8px;
+}
+
+.tsl_login_css #tsl_login_submit:hover,
+.tsl_login_css #tsl_register_submit:hover,
+.tsl_login_css #lost-password-submit:hover,
+.tsl_login_css #save-password-submit:hover,
+.tsl_login_css .button-primary:hover {
+    background-color: var(--tsl-btn-hover-bg);
+    border-color: var(--tsl-btn-hover-border);
+    color: var(--tsl-btn-hover-text);
+}
+
+/* =====================================================
+   Footer Links (Forgot password, Register, Login)
+   ===================================================== */
+.tsl_login_css .tsl_login_footer,
+.tsl_login_css .tsl_lost_pass_footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tsl_login_css .tsl_forgot_password,
+.tsl_login_css .tsl_register,
+.tsl_login_css .tsl_login {
+    background: none;
+    border: none;
+    padding: 0;
     margin: 0;
-    padding-top: 10px;
-    position: relative;
-}
-.tsl_login_form_header__logged-dd-item a {
+    font-size: 14px;
+    line-height: 1;
+    color: var(--tsl-btn-bg);
+    cursor: pointer;
     text-decoration: none;
+    transition: color var(--tsl-transition);
 }
-.tsl_login_form_header__logged-dd-item a:hover {
+
+.tsl_login_css .tsl_forgot_password:hover,
+.tsl_login_css .tsl_register:hover,
+.tsl_login_css .tsl_login:hover {
+    color: var(--tsl-btn-hover-bg);
     text-decoration: underline;
 }
-/* Flex img on left */
-.tsl_wrapper {
-    display: flex;
-}
-.tsl_inside {
-    width: 40%;
-}
-.tsl_inside_content {
-    padding: 15px;
-    width: 60%
-}
-.tsl_inside img {
-    border-top-left-radius: .3rem;
-    border-bottom-left-radius: .3rem;
-    min-height: 100%;
-    min-width: 100%;
-    object-fit: cover;
+
+/* =====================================================
+   Messages (Error & Success)
+   ===================================================== */
+.tsl_login_css .tsl_form_error,
+.tsl_login_css .tsl_register_success,
+.tsl_login_css .tsl_lost_pass_success,
+.tsl_login_css .tsl_reset_pass_success {
+    display: none;
+    padding: 12px 14px;
+    margin-top: 16px;
+    border-radius: var(--tsl-border-radius);
+    font-size: 14px;
+    line-height: 1.5;
 }
 
-.tsl_recaptcha_message {
-    color: #8a8a8a;
+.tsl_login_css .tsl_form_error {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
 }
+
+.tsl_login_css .tsl_register_success,
+.tsl_login_css .tsl_lost_pass_success,
+.tsl_login_css .tsl_reset_pass_success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #16a34a;
+}
+
+/* =====================================================
+   Template 3 - Side Image Layout
+   ===================================================== */
+.tsl_wrapper {
+    display: flex;
+    min-height: 400px;
+}
+
+.tsl_inside {
+    width: 40%;
+    flex-shrink: 0;
+    min-height: 100%;
+}
+
+.tsl_inside_content {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Hide scrollbar for content area in template 3 */
+.tsl_inside_content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tsl_inside_content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tsl_inside_content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+}
+
+.tsl_inside_content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+.tsl_inside img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--tsl-border-radius) 0 0 var(--tsl-border-radius);
+    display: block;
+}
+
+/* Template 3 header/body inside content wrapper */
+.tsl_inside_content .tsl-popup-header {
+    border-radius: 0;
+}
+
+.tsl_inside_content .tsl-popup-body {
+    flex: 1;
+}
+
+/* Template 2 - Top Image */
+.tsl-popup-container > img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: var(--tsl-border-radius) var(--tsl-border-radius) 0 0;
+    display: block;
+}
+
+/* Template 2: Remove header top border radius when image is above */
+.tsl-popup-container > img + .tsl-popup-header {
+    border-radius: 0;
+}
+
+/* Hide image on mobile for template 3 */
+@media (max-width: 576px) {
+    .tsl_inside {
+        display: none;
+    }
+    
+    .tsl_inside_content {
+        width: 100%;
+        max-height: none;
+        overflow-y: visible;
+    }
+    
+    .tsl-popup-container.tsl-popup-lg {
+        max-width: 100%;
+        overflow-y: auto;
+    }
+    
+    .tsl_inside_content .tsl-popup-header {
+        border-radius: var(--tsl-border-radius) var(--tsl-border-radius) 0 0;
+    }
+    
+    .tsl-forms-container:has(.tsl-popup-lg) {
+        max-width: 100%;
+    }
+}
+
+/* =====================================================
+   reCAPTCHA Message
+   ===================================================== */
+.tsl_recaptcha_message {
+    margin-top: 16px;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
 .tsl_recaptcha_message a {
-    color: #5fa0ff;
+    color: var(--tsl-btn-bg);
+    text-decoration: none;
+}
+
+.tsl_recaptcha_message a:hover {
+    text-decoration: underline;
+}
+
+/* =====================================================
+   Widget Header (Login/Register triggers)
+   ===================================================== */
+.tsl_login_form_header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tsl_login_form_header__login,
+.tsl_login_form_header__register,
+.tsl_login_form_header__logged {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tsl_login_form_header__separator {
+    color: #9ca3af;
+}
+
+/* =====================================================
+   Logged-in User Dropdown
+   ===================================================== */
+.tsl_login_form_header__logged {
+    position: relative;
+}
+
+.tsl_login_form_header__logged-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--tsl-logout-btn-text);
+    background-color: var(--tsl-logout-btn-bg);
+    border: 1px solid var(--tsl-logout-btn-border);
+    border-radius: var(--tsl-border-radius);
+    transition: background-color var(--tsl-transition), border-color var(--tsl-transition);
+}
+
+.tsl_login_form_header__logged-btn:hover {
+    background-color: var(--tsl-logout-btn-hover-bg);
+    border-color: var(--tsl-logout-btn-hover-border);
+    color: var(--tsl-logout-btn-hover-text);
+    text-decoration: none;
+}
+
+.tsl_login_form_header__logged-dd {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 160px;
+    background: var(--tsl-dropdown-bg);
+    border: 1px solid #e5e7eb;
+    border-radius: var(--tsl-border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 8px 0;
+    z-index: 1000;
+}
+
+.tsl_login_form_header__logged-dd-icon {
+    position: absolute;
+    top: -6px;
+    right: 16px;
+    width: 12px;
+    height: 12px;
+    fill: var(--tsl-dropdown-bg);
+    stroke: #e5e7eb;
+}
+
+.tsl_login_form_header__logged-dd-item {
+    margin: 0;
+    padding: 0;
+}
+
+.tsl_login_form_header__logged-dd-item a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--tsl-dropdown-text);
+    text-decoration: none;
+    transition: background-color var(--tsl-transition);
+}
+
+.tsl_login_form_header__logged-dd-item a:hover {
+    background-color: #f3f4f6;
+    color: var(--tsl-dropdown-hover-text);
+}
+
+.tsl_login_form_header__logged-dd-item .tsl_logout_icon {
+    display: inline-flex;
+    color: var(--tsl-dropdown-text);
+}
+
+/* SVG Icons in widget */
+.tsl-icon-user,
+.tsl-icon-chevron {
+    vertical-align: middle;
+}
+
+.tsl-icon-chevron {
+    margin-left: 4px;
+    transition: transform var(--tsl-transition);
+}
+
+/* Password hint text */
+.tsl_login_css .tsl_password_hint {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 8px 0 16px 0;
+}
+
+/* Body scroll lock when popup is open */
+body.tsl-popup-active {
+    overflow: hidden;
 }

@@ -1,4 +1,47 @@
 <?php
+/* Load all popup templates via AJAX (single request) */
+add_action('wp_ajax_tsl_load_popup', 'tsl_load_popup');
+add_action('wp_ajax_nopriv_tsl_load_popup', 'tsl_load_popup');
+function tsl_load_popup() {
+    check_ajax_referer('tsl-popup-nonce', 'nonce');
+
+    // Get template settings
+    $recaptcha_status = get_option("tsl_recaptcha_enable", "0");
+    $recaptcha_badge = get_option("tsl_recaptcha_badge", "1");
+    $register_show = get_option("tsl_register_show", 1);
+    $template_id = get_option("tsl_form_template", "1");
+
+    // Login form specific args
+    $args = [
+        "echo" => false,
+        "id_submit" => "tsl_login_submit"
+    ];
+
+    $forms = [];
+
+    // Load login template
+    ob_start();
+    include TSL_PATH . "php/templates/login" . $template_id . ".php";
+    $forms['login'] = ob_get_clean();
+
+    // Load register template
+    ob_start();
+    include TSL_PATH . "php/templates/register" . $template_id . ".php";
+    $forms['register'] = ob_get_clean();
+
+    // Load lost password template
+    ob_start();
+    include TSL_PATH . "php/templates/lost_password" . $template_id . ".php";
+    $forms['lost_password'] = ob_get_clean();
+
+    // Load reset password template (only needed for URL param access)
+    ob_start();
+    include TSL_PATH . "php/templates/reset_password" . $template_id . ".php";
+    $forms['reset_password'] = ob_get_clean();
+
+    wp_send_json_success(['forms' => $forms]);
+}
+
 /* User login */
 add_action('wp_ajax_nopriv_tsl_login_form', 'tsl_login_form');
 function tsl_login_form() {

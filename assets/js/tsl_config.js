@@ -1,6 +1,17 @@
 jQuery(document).ready(function($){
     $('.tsl_colorpicker').wpColorPicker();
 
+    /* Reset colors to default */
+    $('#tsl_reset_colors').on('click', function() {
+        if (confirm('Are you sure you want to reset all colors to default values?')) {
+            $('.tsl_colorpicker').each(function() {
+                var defaultColor = $(this).data('default-color');
+                $(this).val(defaultColor);
+                $(this).wpColorPicker('color', defaultColor);
+            });
+        }
+    });
+
     /* Logout options */
     var tsl_logout = $("#tsl_logout_option").find(":selected").val();
     if(tsl_logout == 2) {

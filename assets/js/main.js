@@ -1,107 +1,217 @@
 jQuery(function($) {
-     // Function to get URL parameters
-     function getUrlParameter(name) {
-        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        var results = regex.exec(window.location.search);
-        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    }
+    // TSL Popup Manager - Hybrid approach: load all forms once, switch instantly
+    var TSL_Popup = {
+        overlay: null,
+        formsContainer: null,
+        forms: null,
+        currentType: null,
+        isLoading: false,
+        isLoaded: false,
 
-    // Check if the "popup" parameter exists in the URL
-    var popup = getUrlParameter('popup');
-    var message = getUrlParameter("message");
+        // Initialize popup system
+        init: function() {
+            this.bindEvents();
+            this.checkUrlParams();
+        },
 
-    // If the "popup" parameter matches "tsl-reset-password", open the modal
-    if (popup === 'tsl-reset-password') {
-        openResetPasswordModal();
-    }
+        // Create overlay and container elements
+        createOverlay: function() {
+            if (this.overlay) return;
+            
+            this.overlay = $('<div class="tsl-popup-overlay"></div>');
+            this.formsContainer = $('<div class="tsl-forms-container"></div>');
+            this.overlay.append(this.formsContainer);
+            $('body').append(this.overlay);
 
-    if (popup === 'tsl-login') {
-        $('.tsl_reset_pass_modal').modal('hide');
-        $('.tsl_login_modal').modal('show');
-
-        if (message === "registration-success") {
-            // Show the success message
-            $(".tsl_login_modal .tsl_register_success")
-                .show()
-                .html(tsl_main.success_icon + tsl_main.register_success);
-        }
-    }
-
-    if (popup === 'tsl-register') {
-        $('.tsl_login_modal').modal('hide');
-        $('.tsl_register_modal').modal('show');
-    }
-
-    // Function to open the reset password modal
-    function openResetPasswordModal() {
-        // Replace with your modal's specific logic or framework
-        $('.tsl_reset_pass_modal').modal('show');
-    }
-
-    $(".js--tsl-login-popup").on("click", function(){
-        $('.tsl_lost_pass_modal').modal('hide');
-        $('.tsl_login_modal').modal('show');
-    });
-
-    $(".js--tsl-register-popup").on("click", function(){
-        $('.tsl_login_modal').modal('hide');
-        $('.tsl_register_modal').modal('show');
-    });
-
-    $(".js--tsl-pass-popup").on("click", function(){
-        $('.tsl_login_modal').modal('hide');
-        $('.tsl_register_modal').modal('hide');
-        $('.tsl_lost_pass_modal').modal('show');
-    });
-
-    $(".js--tsl-logged-show").on("click", function(){
-        var logout_dd = $(".tsl_login_form_header__logged-dd");
-        if(logout_dd.is(":hidden")) {
-            logout_dd.css("display", "table");
-        } else {
-            logout_dd.hide();
-        }
-    });
-    $(".tsl_login_modal #user_login, .tsl_login_modal #user_pass").on("focusin", function(){
-        $('.tsl_login_modal .tsl_form_error').hide();
-        $(".tsl_login_modal #user_login").removeAttr("style");
-        $(".tsl_login_modal #user_pass").removeAttr("style");
-    });
-
-    $(".tsl_register_modal #tsl_username, .tsl_register_modal #tsl_email, .tsl_register_modal #tsl_password").on("focusin", function(){
-        $('.tsl_register_modal .tsl_form_error').hide();
-        $(".tsl_register_modal #tsl_username").removeAttr("style");
-        $(".tsl_register_modal #tsl_email").removeAttr("style");
-        $(".tsl_register_modal #tsl_password").removeAttr("style");
-    });
-
-    /* Login form - Sign in/Errors */
-    $("#tsl_login_submit").on("click", function(e){
-        e.preventDefault();
-
-        var username = $("#user_login").val();
-        var pass = $("#user_pass").val();
-        if(username === "" || pass === "") {
-            $('.tsl_login_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.fields_empty);
-            $(".tsl_login_modal #user_login").attr("style", "border: 1px solid red !important");
-            $(".tsl_login_modal #user_pass").attr("style", "border: 1px solid red !important");
-            return false;
-        }
-
-        if(tsl_main.recaptcha_status === "1") {
-            grecaptcha.ready(function () {
-                grecaptcha.execute(tsl_main.site_key, { action: 'submit' }).then(function (token) {
-                    var recaptchaResponse = document.getElementById('recaptchaResponse');
-                    recaptchaResponse.value = token;
-                    _tsl_login_ajax();
-                });
+            // Close on overlay click
+            this.overlay.on('click', function(e) {
+                if ($(e.target).hasClass('tsl-popup-overlay')) {
+                    TSL_Popup.close();
+                }
             });
-        } else {
-            _tsl_login_ajax();
-        }
 
-        function _tsl_login_ajax() {
+            // Close on ESC key
+            $(document).on('keydown.tslPopup', function(e) {
+                if (e.key === 'Escape' && TSL_Popup.overlay && TSL_Popup.overlay.hasClass('tsl-popup-open')) {
+                    TSL_Popup.close();
+                }
+            });
+        },
+
+        // Load all forms via single AJAX request
+        loadForms: function(callback) {
+            if (this.isLoading) return;
+            if (this.isLoaded && this.forms) {
+                if (callback) callback();
+                return;
+            }
+
+            this.isLoading = true;
+            var self = this;
+
+            $.ajax({
+                type: 'POST',
+                url: tsl_main.ajaxurl,
+                data: {
+                    action: 'tsl_load_popup',
+                    nonce: tsl_main.popup_nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data.forms) {
+                        self.forms = response.data.forms;
+                        self.isLoaded = true;
+                        self.renderForms();
+                        self.bindFormEvents();
+                        if (callback) callback();
+                    }
+                    self.isLoading = false;
+                },
+                error: function() {
+                    self.isLoading = false;
+                }
+            });
+        },
+
+        // Render all forms into container
+        renderForms: function() {
+            var self = this;
+            this.formsContainer.empty();
+
+            // Add each form wrapped in a container
+            $.each(this.forms, function(type, html) {
+                var formWrapper = $('<div class="tsl-form-wrapper" data-form-type="' + type + '"></div>');
+                formWrapper.html(html);
+                formWrapper.hide();
+                self.formsContainer.append(formWrapper);
+            });
+        },
+
+        // Open popup and show specific form
+        open: function(formType, callback) {
+            var self = this;
+            this.createOverlay();
+
+            // Load forms if not loaded yet
+            if (!this.isLoaded) {
+                this.loadForms(function() {
+                    self.showForm(formType);
+                    self.show();
+                    if (callback) callback();
+                });
+            } else {
+                this.showForm(formType);
+                this.show();
+                if (callback) callback();
+            }
+        },
+
+        // Show specific form (instant switch, no AJAX)
+        showForm: function(formType) {
+            this.currentType = formType;
+            
+            // Hide all forms
+            this.formsContainer.find('.tsl-form-wrapper').hide();
+            
+            // Show requested form
+            this.formsContainer.find('.tsl-form-wrapper[data-form-type="' + formType + '"]').show();
+            
+            // Clear any previous error/success messages
+            this.formsContainer.find('.tsl_form_error, .tsl_register_success, .tsl_lost_pass_success, .tsl_reset_pass_success').hide();
+            this.formsContainer.find('.tsl-input-error').removeClass('tsl-input-error');
+        },
+
+        // Show the popup overlay
+        show: function() {
+            $('body').addClass('tsl-popup-active');
+            this.overlay.addClass('tsl-popup-open');
+        },
+
+        // Close the popup
+        close: function() {
+            if (!this.overlay) return;
+            
+            $('body').removeClass('tsl-popup-active');
+            this.overlay.removeClass('tsl-popup-open');
+            this.currentType = null;
+        },
+
+        // Bind close button and form switch events
+        bindFormEvents: function() {
+            var self = this;
+
+            // Close buttons
+            this.formsContainer.on('click', '.tsl-popup-close', function() {
+                self.close();
+            });
+
+            // Switch to register (instant)
+            this.formsContainer.on('click', '.js--tsl-register-popup', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.showForm('register');
+            });
+
+            // Switch to login (instant)
+            this.formsContainer.on('click', '.js--tsl-login-popup', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.showForm('login');
+            });
+
+            // Switch to forgot password (instant)
+            this.formsContainer.on('click', '.js--tsl-pass-popup', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                self.showForm('lost_password');
+            });
+
+            // Bind the specific form handlers
+            this.bindLoginForm();
+            this.bindRegisterForm();
+            this.bindLostPasswordForm();
+            this.bindResetPasswordForm();
+        },
+
+        // Login form handler
+        bindLoginForm: function() {
+            var self = this;
+            
+            this.formsContainer.on("click", "#tsl_login_submit", function(e) {
+                e.preventDefault();
+
+                var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="login"]');
+                var username = form.find("#user_login").val();
+                var pass = form.find("#user_pass").val();
+                
+                if (username === "" || pass === "") {
+                    self.showError(form, '.tsl_form_error', tsl_main.fields_empty);
+                    form.find("#user_login, #user_pass").addClass('tsl-input-error');
+                    return false;
+                }
+
+                if (tsl_main.recaptcha_status === "1") {
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute(tsl_main.site_key, { action: 'submit' }).then(function(token) {
+                            form.find('#recaptchaResponse').val(token);
+                            self.submitLogin(form, username, pass);
+                        });
+                    });
+                } else {
+                    self.submitLogin(form, username, pass);
+                }
+            });
+
+            // Clear errors on focus
+            this.formsContainer.on("focusin", "#user_login, #user_pass", function() {
+                var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="login"]');
+                form.find('.tsl_form_error').hide();
+                form.find("#user_login, #user_pass").removeClass('tsl-input-error');
+            });
+        },
+
+        submitLogin: function(form, username, pass) {
+            var self = this;
+            
             $.ajax({
                 type: 'POST',
                 url: tsl_main.ajaxurl,
@@ -109,56 +219,67 @@ jQuery(function($) {
                     action: 'tsl_login_form',
                     username: username,
                     pass: pass,
-                    security: $('#security').val(),
-                    recaptcha_status: tsl_main.recaptcha_status
+                    security: form.find('#security').val(),
+                    recaptcha_status: tsl_main.recaptcha_status,
+                    recaptcha_response: form.find('#recaptchaResponse').val()
                 },
-                success: function(data, textStatus, XMLHTTPRequest) {
+                success: function(data) {
                     data = JSON.parse(data);
-                    if(data === '0') {
-                        $('.tsl_login_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.fields_wrong);
-                        $(".tsl_login_modal #user_login").attr("style", "border: 1px solid red !important");
-                        $(".tsl_login_modal #user_pass").attr("style", "border: 1px solid red !important");
-                        return false;
+                    if (data === '0') {
+                        self.showError(form, '.tsl_form_error', tsl_main.fields_wrong);
+                        form.find("#user_login, #user_pass").addClass('tsl-input-error');
                     } else {
                         if (window.location.href.indexOf('popup=tsl-login') > -1) {
-                            // Redirect to the homepage
                             window.location.href = '/';
                         } else {
-                            // Reload the current page
                             document.location.reload();
                         }
                     }
                 }
             });
-        }
-    });
+        },
 
-    $("#tsl_register_submit").on("click", function(e){
-        e.preventDefault(); 
-        var username = $("#tsl_username").val();
-        var email = $("#tsl_email").val();
-        var pass = $("#tsl_password").val();
-        if(username === "" || email === "" || pass === "") {
-            $('.tsl_register_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.rfields_empty);
-            $(".tsl_register_modal #tsl_username").attr("style", "border: 1px solid red !important");
-            $(".tsl_register_modal #tsl_email").attr("style", "border: 1px solid red !important");
-            $(".tsl_register_modal #tsl_password").attr("style", "border: 1px solid red !important");
-            return false;
-        }
+        // Register form handler
+        bindRegisterForm: function() {
+            var self = this;
+            
+            this.formsContainer.on("click", "#tsl_register_submit", function(e) {
+                e.preventDefault();
+                
+                var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="register"]');
+                var username = form.find("#tsl_username").val();
+                var email = form.find("#tsl_email").val();
+                var pass = form.find("#tsl_password").val();
+                
+                if (username === "" || email === "" || pass === "") {
+                    self.showError(form, '.tsl_form_error', tsl_main.rfields_empty);
+                    form.find("#tsl_username, #tsl_email, #tsl_password").addClass('tsl-input-error');
+                    return false;
+                }
 
-        if(tsl_main.recaptcha_status === "1") {
-            grecaptcha.ready(function () {
-                grecaptcha.execute(tsl_main.site_key, { action: 'submit' }).then(function (token) {
-                    var recaptchaResponse = document.getElementById('recaptchaResponse');
-                    recaptchaResponse.value = token;
-                    _tsl_register_ajax();
-                });
+                if (tsl_main.recaptcha_status === "1") {
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute(tsl_main.site_key, { action: 'submit' }).then(function(token) {
+                            form.find('#recaptchaResponse').val(token);
+                            self.submitRegister(form, username, email, pass);
+                        });
+                    });
+                } else {
+                    self.submitRegister(form, username, email, pass);
+                }
             });
-        } else {
-            _tsl_register_ajax();
-        }
 
-        function _tsl_register_ajax() {
+            // Clear errors on focus
+            this.formsContainer.on("focusin", "#tsl_username, #tsl_email, #tsl_password", function() {
+                var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="register"]');
+                form.find('.tsl_form_error').hide();
+                form.find("#tsl_username, #tsl_email, #tsl_password").removeClass('tsl-input-error');
+            });
+        },
+
+        submitRegister: function(form, username, email, pass) {
+            var self = this;
+            
             $.ajax({
                 type: 'POST',
                 url: tsl_main.ajaxurl,
@@ -167,25 +288,25 @@ jQuery(function($) {
                     username: username,
                     email: email,
                     pass: pass,
-                    rsecurity: $('#rsecurity').val(),
-                    recaptcha_status: tsl_main.recaptcha_status
+                    rsecurity: form.find('#rsecurity').val(),
+                    recaptcha_status: tsl_main.recaptcha_status,
+                    recaptcha_response: form.find('#recaptchaResponse').val()
                 },
-                success: function(data, textStatus, XMLHTTPRequest) {
+                success: function(data) {
                     data = JSON.parse(data);
-                    if(data === '0') {
-                        $('.tsl_register_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.username_exists);
-                        $(".tsl_register_modal #tsl_username").attr("style", "border: 1px solid red !important");
-                        return false;
-                    } else if(data === '2') {
-                        $('.tsl_register_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.register_fail);
-                    } else if(data === '3') {
-                        $('.tsl_register_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.email_exists);
-                        $(".tsl_register_modal #tsl_email").attr("style", "border: 1px solid red !important");
-                    } else if(data === '4') {
-                        $('.tsl_register_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.recaptcha_error);
-                    } else if(data === '5') {
-                        $('.tsl_register_modal .tsl_form_error').show().html(tsl_main.error_icon + tsl_main.email_error);
-                        $(".tsl_register_modal #tsl_email").attr("style", "border: 1px solid red !important");
+                    if (data === '0') {
+                        self.showError(form, '.tsl_form_error', tsl_main.username_exists);
+                        form.find("#tsl_username").addClass('tsl-input-error');
+                    } else if (data === '2') {
+                        self.showError(form, '.tsl_form_error', tsl_main.register_fail);
+                    } else if (data === '3') {
+                        self.showError(form, '.tsl_form_error', tsl_main.email_exists);
+                        form.find("#tsl_email").addClass('tsl-input-error');
+                    } else if (data === '4') {
+                        self.showError(form, '.tsl_form_error', tsl_main.recaptcha_error);
+                    } else if (data === '5') {
+                        self.showError(form, '.tsl_form_error', tsl_main.email_error);
+                        form.find("#tsl_email").addClass('tsl-input-error');
                     } else {
                         if (tsl_main.register_redirect && tsl_main.register_redirect !== '') {
                             window.location.href = tsl_main.register_redirect;
@@ -193,143 +314,209 @@ jQuery(function($) {
                     }
                 }
             });
-        }
-    });
+        },
 
-    $("#lost-password-submit").on("click", function (e) {
-        e.preventDefault();
-    
-        var user_email = $("#lost-password-email").val();
-        var errorElement = $('.tsl_login_css .tsl_form_error');
-        var successElement = $('.tsl_login_css .tsl_lost_pass_success');
-    
-        // Clear previous messages
-        errorElement.hide().html("");
-        successElement.hide().html("");
-        $("#lost-password-email").css("border", "");
-    
-        // Validate input
-        if (user_email === "") {
-            errorElement
-                .show()
-                .html(tsl_main.error_icon + tsl_main.email_empty);
-            $("#lost-password-email").css("border", "1px solid red");
-            return false;
-        }
-    
-        // Handle reCAPTCHA if enabled
-        if (tsl_main.recaptcha_status === "1") {
-            grecaptcha.ready(function () {
-                grecaptcha.execute(tsl_main.site_key, { action: 'submit' }).then(function (token) {
-                    $("#recaptchaResponse").val(token); // Set token in hidden field
-                    _tsl_lost_pass_ajax();
-                });
+        // Lost password form handler
+        bindLostPasswordForm: function() {
+            var self = this;
+            
+            this.formsContainer.on("click", "#lost-password-submit", function(e) {
+                e.preventDefault();
+                
+                var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="lost_password"]');
+                var user_email = form.find("#lost-password-email").val();
+                
+                form.find('.tsl_form_error').hide();
+                form.find('.tsl_lost_pass_success').hide();
+                form.find("#lost-password-email").removeClass('tsl-input-error');
+
+                if (user_email === "") {
+                    self.showError(form, '.tsl_form_error', tsl_main.email_empty);
+                    form.find("#lost-password-email").addClass('tsl-input-error');
+                    return false;
+                }
+
+                if (tsl_main.recaptcha_status === "1") {
+                    grecaptcha.ready(function() {
+                        grecaptcha.execute(tsl_main.site_key, { action: 'submit' }).then(function(token) {
+                            form.find('#recaptchaResponse').val(token);
+                            self.submitLostPassword(form, user_email);
+                        });
+                    });
+                } else {
+                    self.submitLostPassword(form, user_email);
+                }
             });
-        } else {
-            _tsl_lost_pass_ajax();
-        }
-    
-        function _tsl_lost_pass_ajax() {
+        },
+
+        submitLostPassword: function(form, user_email) {
+            var self = this;
+            
             $.ajax({
                 type: 'POST',
                 url: tsl_main.ajaxurl,
                 data: {
                     action: 'tsl_lost_pass_form',
                     user_email: user_email,
-                    lsecurity: $('#lsecurity').val(),
-                    recaptcha_response: $('#recaptchaResponse').val(),
+                    lsecurity: form.find('#lsecurity').val(),
+                    recaptcha_response: form.find('#recaptchaResponse').val(),
                     recaptcha_status: tsl_main.recaptcha_status
                 },
-                success: function (response) {
+                success: function(response) {
                     if (response.success) {
-                        // Show success message
-                        successElement
-                            .show()
-                            .html(tsl_main.success_icon + response.data.message);
+                        self.showSuccess(form, '.tsl_lost_pass_success', response.data.message);
                     } else if (response.data && response.data.message) {
-                        // Show error message from PHP
-                        errorElement
-                            .show()
-                            .html(tsl_main.error_icon + response.data.message);
-                        $("#lost-password-email").css("border", "1px solid red");
+                        self.showError(form, '.tsl_form_error', response.data.message);
+                        form.find("#lost-password-email").addClass('tsl-input-error');
                     } else {
-                        // Show generic error message if PHP didn't provide a message
-                        errorElement
-                            .show()
-                            .html(tsl_main.error_icon + tsl_main.unexpected_error);
+                        self.showError(form, '.tsl_form_error', tsl_main.unexpected_error);
                     }
                 },
-                error: function () {
-                    // Handle AJAX error
-                    errorElement
-                        .show()
-                        .html(tsl_main.error_icon + tsl_main.unexpected_error);
+                error: function() {
+                    self.showError(form, '.tsl_form_error', tsl_main.unexpected_error);
                 }
             });
-        }
-    });
-    $("#save-password-submit").on("click", function () {
-        var password = $("#new-password").val();
-        var key = new URLSearchParams(window.location.search).get("key"); // Get 'key' from URL
-        var login = new URLSearchParams(window.location.search).get("login"); // Get 'login' from URL
-        var errorElement = $('.tsl_login_css .tsl_form_error');
-        var successElement = $('.tsl_login_css .tsl_reset_pass_success');
-    
-        // Clear previous messages
-        errorElement.hide().html("");
-        successElement.hide().html("");
-    
-        // Basic validation
-        if (!password || password.length < 12) {
-            errorElement
-                .show()
-                .html(tsl_main.error_icon + tsl_main.short_pass);
-            return false;
-        }
-    
-        if (!key || !login) {
-            errorElement
-                .show()
-                .html(tsl_main.error_icon + tsl_main.invalid_reset);
-            return false;
-        }
-    
-        // AJAX request to save the new password
-        $.ajax({
-            type: "POST",
-            url: tsl_main.ajaxurl,
-            data: {
-                action: "tsl_save_new_password",
-                password: password,
-                key: key,
-                login: login,
-                psecurity: $("#psecurity").val(),
-            },
-            success: function (response) {
-                if (response.success) {
-                    successElement
-                        .show()
-                        .html(tsl_main.success_icon + response.data.message);
+        },
 
-                    // Redirect after 2 seconds
-                    setTimeout(function () {
-                        window.location.href = response.data.redirect_url;
-                    }, 1000);
-                } else if (response.data && response.data.message) {
-                    errorElement
-                        .show()
-                        .html(tsl_main.error_icon + response.data.message);
-                } else {
-                    errorElement
-                        .show()
-                        .html(tsl_main.error_icon + tsl_main.unexpected_error);
+        // Reset password form handler
+        bindResetPasswordForm: function() {
+            var self = this;
+            
+            this.formsContainer.on("click", "#save-password-submit", function(e) {
+                e.preventDefault();
+                
+                var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="reset_password"]');
+                var password = form.find("#new-password").val();
+                var key = new URLSearchParams(window.location.search).get("key");
+                var login = new URLSearchParams(window.location.search).get("login");
+
+                form.find('.tsl_form_error').hide();
+                form.find('.tsl_reset_pass_success').hide();
+
+                if (!password || password.length < 12) {
+                    self.showError(form, '.tsl_form_error', tsl_main.short_pass);
+                    return false;
                 }
-            },
-            error: function () {
-                errorElement
-                    .show()
-                    .html(tsl_main.error_icon + tsl_main.unexpected_error);
-            },
-        });
-    });    
+
+                if (!key || !login) {
+                    self.showError(form, '.tsl_form_error', tsl_main.invalid_reset);
+                    return false;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: tsl_main.ajaxurl,
+                    data: {
+                        action: "tsl_save_new_password",
+                        password: password,
+                        key: key,
+                        login: login,
+                        psecurity: form.find("#psecurity").val()
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            self.showSuccess(form, '.tsl_reset_pass_success', response.data.message);
+                            setTimeout(function() {
+                                window.location.href = response.data.redirect_url;
+                            }, 1000);
+                        } else if (response.data && response.data.message) {
+                            self.showError(form, '.tsl_form_error', response.data.message);
+                        } else {
+                            self.showError(form, '.tsl_form_error', tsl_main.unexpected_error);
+                        }
+                    },
+                    error: function() {
+                        self.showError(form, '.tsl_form_error', tsl_main.unexpected_error);
+                    }
+                });
+            });
+        },
+
+        // Show error message
+        showError: function(form, selector, message) {
+            form.find(selector).show().html(tsl_main.error_icon + message);
+        },
+
+        // Show success message
+        showSuccess: function(form, selector, message) {
+            form.find(selector).show().html(tsl_main.success_icon + message);
+        },
+
+        // Bind trigger events (from external elements like widget)
+        bindEvents: function() {
+            var self = this;
+
+            // Login popup trigger
+            $(document).on("click", ".js--tsl-login-popup", function(e) {
+                if (!self.overlay || !self.overlay.hasClass('tsl-popup-open')) {
+                    e.preventDefault();
+                    self.open('login');
+                }
+            });
+
+            // Register popup trigger
+            $(document).on("click", ".js--tsl-register-popup", function(e) {
+                if (!self.overlay || !self.overlay.hasClass('tsl-popup-open')) {
+                    e.preventDefault();
+                    self.open('register');
+                }
+            });
+
+            // Lost password popup trigger
+            $(document).on("click", ".js--tsl-pass-popup", function(e) {
+                if (!self.overlay || !self.overlay.hasClass('tsl-popup-open')) {
+                    e.preventDefault();
+                    self.open('lost_password');
+                }
+            });
+
+            // Logged user dropdown toggle
+            $(document).on("click", ".js--tsl-logged-show", function() {
+                var logout_dd = $(".tsl_login_form_header__logged-dd");
+                if (logout_dd.is(":hidden")) {
+                    logout_dd.css("display", "block");
+                } else {
+                    logout_dd.hide();
+                }
+            });
+
+            // Close dropdown when clicking outside
+            $(document).on("click", function(e) {
+                if (!$(e.target).closest('.tsl_login_form_header__logged').length) {
+                    $(".tsl_login_form_header__logged-dd").hide();
+                }
+            });
+        },
+
+        // Check URL parameters on page load
+        checkUrlParams: function() {
+            var self = this;
+            
+            function getUrlParameter(name) {
+                name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                var results = regex.exec(window.location.search);
+                return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+            }
+
+            var popup = getUrlParameter('popup');
+            var message = getUrlParameter('message');
+
+            if (popup === 'tsl-reset-password') {
+                self.open('reset_password');
+            } else if (popup === 'tsl-login') {
+                self.open('login', function() {
+                    if (message === "registration-success") {
+                        var form = self.formsContainer.find('.tsl-form-wrapper[data-form-type="login"]');
+                        self.showSuccess(form, '.tsl_register_success', tsl_main.register_success);
+                    }
+                });
+            } else if (popup === 'tsl-register') {
+                self.open('register');
+            }
+        }
+    };
+
+    // Initialize
+    TSL_Popup.init();
 }); 

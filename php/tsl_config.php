@@ -115,56 +115,63 @@ if(isset($_GET['save_config'])) {
                                     <div class='item'>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_hbgc"><?php esc_html_e("Header background color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_hbgc" id="tsl_hbgc" value="<?php echo esc_attr(get_option("tsl_hbgc", "#fff")); ?>" data-default-color="#fff" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_hbgc" id="tsl_hbgc" value="<?php echo esc_attr(get_option("tsl_hbgc", "#1a1a2e")); ?>" data-default-color="#1a1a2e" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_htc"><?php esc_html_e("Header text color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_htc" id="tsl_htc" value="<?php echo esc_attr(get_option("tsl_htc", "#000")); ?>" data-default-color="#000" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_htc" id="tsl_htc" value="<?php echo esc_attr(get_option("tsl_htc", "#ffffff")); ?>" data-default-color="#ffffff" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_cbgc"><?php esc_html_e("Content background color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_cbgc" id="tsl_cbgc" value="<?php echo esc_attr(get_option("tsl_cbgc", "#fff")); ?>" data-default-color="#fff" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_cbgc" id="tsl_cbgc" value="<?php echo esc_attr(get_option("tsl_cbgc", "#f8f9fa")); ?>" data-default-color="#f8f9fa" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_ctc"><?php esc_html_e("Content text (label) color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_ctc" id="tsl_ctc" value="<?php echo esc_attr(get_option("tsl_ctc", "#212529")); ?>" data-default-color="#212529" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_ctc" id="tsl_ctc" value="<?php echo esc_attr(get_option("tsl_ctc", "#374151")); ?>" data-default-color="#374151" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_cibgc"><?php esc_html_e("Content input background color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_cibgc" id="tsl_cibgc" value="<?php echo esc_attr(get_option("tsl_cibgc", "#fafafa")); ?>" data-default-color="#fafafa" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_cibgc" id="tsl_cibgc" value="<?php echo esc_attr(get_option("tsl_cibgc", "#ffffff")); ?>" data-default-color="#ffffff" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_citc"><?php esc_html_e("Content input text color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_citc" id="tsl_citc" value="<?php echo esc_attr(get_option("tsl_citc", "#111")); ?>" data-default-color="#111" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_citc" id="tsl_citc" value="<?php echo esc_attr(get_option("tsl_citc", "#1f2937")); ?>" data-default-color="#1f2937" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_cibc"><?php esc_html_e("Content input border color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_cibc" id="tsl_cibc" value="<?php echo esc_attr(get_option("tsl_cibc", "#a3a3a3")); ?>" data-default-color="#a3a3a3" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_cibc" id="tsl_cibc" value="<?php echo esc_attr(get_option("tsl_cibc", "#e5e7eb")); ?>" data-default-color="#e5e7eb" />
+                                        </div>
+                                        <div class="tsl_custom_colorpicker">
+                                            <label for="tsl_pbc"><?php esc_html_e("Popup border color", "tipster_script_login"); ?></label><br>
+                                            <input type="text" class="tsl_colorpicker" name="tsl_pbc" id="tsl_pbc" value="<?php echo esc_attr(get_option("tsl_pbc", "#374151")); ?>" data-default-color="#374151" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_sbbgc"><?php esc_html_e("Submit button background color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_sbbgc" id="tsl_sbbgc" value="<?php echo esc_attr(get_option("tsl_sbbgc", "#0170B9")); ?>" data-default-color="#0170B9" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_sbbgc" id="tsl_sbbgc" value="<?php echo esc_attr(get_option("tsl_sbbgc", "#6366f1")); ?>" data-default-color="#6366f1" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_sbtc"><?php esc_html_e("Submit button text color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_sbtc" id="tsl_sbtc" value="<?php echo esc_attr(get_option("tsl_sbtc", "#fff")); ?>" data-default-color="#fff" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_sbtc" id="tsl_sbtc" value="<?php echo esc_attr(get_option("tsl_sbtc", "#ffffff")); ?>" data-default-color="#ffffff" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_sbbc"><?php esc_html_e("Submit button border color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_sbbc" id="tsl_sbbc" value="<?php echo esc_attr(get_option("tsl_sbbc", "#0170B9")); ?>" data-default-color="#0170B9" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_sbbc" id="tsl_sbbc" value="<?php echo esc_attr(get_option("tsl_sbbc", "#6366f1")); ?>" data-default-color="#6366f1" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_sbhbgc"><?php esc_html_e("Submit button hover background color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_sbhbgc" id="tsl_sbhbgc" value="<?php echo esc_attr(get_option("tsl_sbhbgc", "#3a3a3a")); ?>" data-default-color="#3a3a3a" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_sbhbgc" id="tsl_sbhbgc" value="<?php echo esc_attr(get_option("tsl_sbhbgc", "#4f46e5")); ?>" data-default-color="#4f46e5" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_sbhtc"><?php esc_html_e("Submit button hover text color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_sbhtc" id="tsl_sbhtc" value="<?php echo esc_attr(get_option("tsl_sbhtc", "#fff")); ?>" data-default-color="#fff" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_sbhtc" id="tsl_sbhtc" value="<?php echo esc_attr(get_option("tsl_sbhtc", "#ffffff")); ?>" data-default-color="#ffffff" />
                                         </div>
                                         <div class="tsl_custom_colorpicker">
                                             <label for="tsl_sbhbc"><?php esc_html_e("Submit button hover border color", "tipster_script_login"); ?></label><br>
-                                            <input type="text" class="tsl_colorpicker" name="tsl_sbhbc" id="tsl_sbhbc" value="<?php echo esc_attr(get_option("tsl_sbhbc", "#3a3a3a")); ?>" data-default-color="#3a3a3a" />
+                                            <input type="text" class="tsl_colorpicker" name="tsl_sbhbc" id="tsl_sbhbc" value="<?php echo esc_attr(get_option("tsl_sbhbc", "#4f46e5")); ?>" data-default-color="#4f46e5" />
                                         </div>
+                                    </div>
+                                    <div style="margin-top: 20px;">
+                                        <button type="button" id="tsl_reset_colors" class="button"><?php esc_html_e("Reset Colors to Default", "tipster_script_login"); ?></button>
                                     </div>
                                 </div>
                             </th>

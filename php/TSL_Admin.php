@@ -61,6 +61,7 @@ class TSL_Admin {
             "tsl_sbhbgc"               => sanitize_hex_color($_POST['tsl_sbhbgc']),
             "tsl_sbhtc"                => sanitize_hex_color($_POST['tsl_sbhtc']),
             "tsl_sbhbc"                => sanitize_hex_color($_POST['tsl_sbhbc']),
+            "tsl_pbc"                  => sanitize_hex_color($_POST['tsl_pbc']),
             "tsl_login_icon"           => wp_kses($_POST['tsl_login_icon'], $allowed_html),
             "tsl_register_icon"        => wp_kses($_POST['tsl_register_icon'], $allowed_html),
             "tsl_logout_icon"          => wp_kses($_POST['tsl_logout_icon'], $allowed_html),
@@ -101,6 +102,7 @@ class TSL_Admin {
             "tsl_sbhbgc"           => sanitize_hex_color($_POST['tsl_sbhbgc']),
             "tsl_sbhtc"            => sanitize_hex_color($_POST['tsl_sbhtc']),
             "tsl_sbhbc"            => sanitize_hex_color($_POST['tsl_sbhbc']),
+            "tsl_pbc"              => sanitize_hex_color($_POST['tsl_pbc']),
             "tsl_recaptcha_enable" => sanitize_text_field($_POST['tsl_recaptcha_enable']),
             "tsl_recaptcha_badge"  => sanitize_text_field($_POST['tsl_recaptcha_badge']),
         ];
