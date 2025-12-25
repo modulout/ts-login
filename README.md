@@ -1,13 +1,53 @@
-# Ts login popup - WordPress plugin
-[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](http://www.gnu.org/licenses/gpl-2.0.html) [![version](https://img.shields.io/badge/version-1.0.5-blue.svg)](https://github.com/modulout/ts_login)
+# TS Login – Frontend Login & Registration for WordPress
 
-With the TS login plugin, your users can log in or/and register from the front page (not needed to go to wp-admin anymore). A simple widget is added, but you can add a class for login and a class for registration on any website element. The plugin is working with the latest WordPress version and is fully customizable. You can change colors in wp-admin to have your website look-alike feel.
+[![License: GPLv2](https://img.shields.io/badge/License-GPLv2-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+[![Version](https://img.shields.io/badge/version-1.0.5-blue.svg)](https://github.com/modulout/ts-login)
 
-There are also 3 login/register options: basic (only login or/and register form), the image on top (login or/and register form with image on top), and image on the left side (login or/and register form with image on the left side). All 3 options are fully responsive.
+**TS Login** is a lightweight WordPress plugin that allows users to **log in, register, and reset their passwords directly from the frontend**, without accessing the WordPress `wp-admin` area.
 
-Google reCAPTCHA v3 is also available and you can use it with your site and secret key. By default this option is disabled.
+It is built for **membership websites, subscription platforms, and frontend-only WordPress projects**, with a strong focus on **performance, stability, and compatibility**.
 
-Bootstrap library and Font-Awesome library are included.
+---
+
+## Key Features
+
+- Frontend login, registration, and password reset (popup-based)
+- No access to `wp-admin` required for users
+- Trigger login or registration from any element using CSS classes
+- AJAX-loaded popup (no unnecessary markup in the DOM)
+- Fast, lightweight, and conflict-free
+- Fully responsive design
+- Customizable colors and layout via WordPress admin
+- Multi-language ready
+- Compatible with modern WordPress themes and page builders
+- Official login plugin for Tipster Script and OwnTheGame
+
+---
+
+## Performance & Stability (v1.0.5)
+
+Starting from version **1.0.5**, TS Login has been fully rebuilt with performance and compatibility in mind:
+
+- Complete frontend UI rewrite
+- Removed Bootstrap dependency
+- Removed Font Awesome dependency
+- No framework conflicts with themes or plugins
+- Popup content loaded via AJAX
+- Faster page load and improved stability
+
+---
+
+## Integration
+
+TS Login integrates seamlessly with:
+
+- **Tipster Script** – a professional WordPress solution for tipster and subscription platforms  
+  https://tipsterscript.com
+
+- **OwnTheGame** – a hosted service built on Tipster Script for launching subscription websites  
+  https://ownthegame.app
+
+---
 
 ## Installation
 
@@ -32,17 +72,6 @@ You can use a custom class on any element on your website. In this case, you nee
 ```html
 js--tsl-register-popup
 ```
-
-## TO-DO
-
-- [x] Make a standalone version
-- [x] Logout from front page
-- [x] Different style options for login/register popup
-- [x] Add captcha option
-- [x] Options to change icons or disable them
-- [x] Upload to WordPress directory
-- [x] Lost password and Reset password functionality in pop-up
-- [x] Option to show register button on login pop-up
 
 ## Credits
 
